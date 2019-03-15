@@ -32,7 +32,6 @@ void loop(){
   if (timeStatus()!= timeNotSet) {
    Serial.print(String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second()));
   }
-  Serial.print(String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second()));
   DynamicJsonDocument  doc(200);
   doc["loc"] = "chair";
 
@@ -47,10 +46,9 @@ void loop(){
       digitalWrite(WARNPin, LOW);
       analogWrite(LEDpin, LOW);
       Serial.println("In idle state!");
-      Serial.println("\n");
+      //Serial.println("\n");
       if (fsrReading > 200) {
         Serial.println("Someone sits on! Transition to busy state!");
-        Serial.println("\n");
         digitalWrite(IDLEPin, LOW);
         // reading (0-1023) -> write (0-255)
         LEDbrightness = map(fsrReading, 0, 1023, 0, 255);
@@ -58,8 +56,8 @@ void loop(){
         // time is in GMT
         startTime = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());
         starTime = hour()*3600 + minute()*60 + second();
-        Serial.println("num");
-        Serial.println(starTime); 
+//        Serial.println("num");
+//        Serial.println(starTime); 
         state = 1;
       }
       else {
@@ -70,14 +68,14 @@ void loop(){
     case 1:
       digitalWrite(IDLEPin, LOW);
       Serial.println("In busy state!");
-      Serial.println("\n");
+      //Serial.println("\n");
       if (fsrReading < 10) {
         analogWrite(LEDpin, LOW);
         Serial.println("Someone leaves! Transition to idle state!");
-        Serial.println("\n");
         doc["start"] = startTime;
         doc["stop"] = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());        
         serializeJson(doc, Serial);
+        Serial.println("\n");
         state = 0;
       }
       else {
@@ -85,6 +83,7 @@ void loop(){
         analogWrite(LEDpin, LEDbrightness);
         currTime = hour()*3600 + minute()*60 + second();
         if (currTime - starTime > 5) {
+          Serial.println("Someone sits for too long! Transition to warning state!");
           state = 2;
         }
         else {
@@ -97,14 +96,14 @@ void loop(){
       digitalWrite(IDLEPin, LOW);
       digitalWrite(WARNPin, HIGH);
       Serial.println("In warning state!");
-      Serial.println("\n");
+     // Serial.println("\n");
       if (fsrReading < 10) {
         analogWrite(LEDpin, LOW);
         Serial.println("Someone leaves from warning! Transition to idle state!");
-        Serial.println("\n");
         doc["start"] = startTime;
         doc["stop"] = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());        
         serializeJson(doc, Serial);
+        Serial.println("\n");
         state = 0;
       }
       else {
