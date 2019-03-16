@@ -5,9 +5,10 @@
 #define TIME_REQUEST  7    // ASCII bell character requests a time sync message 
 
 int fsrAnalogPin = 0; // FSR is connected to analog 0
-int LEDpin = 11; // connect Red LED to pin 11 (PWM pin)
+int LEDpin = 11; // connect Yellow LED to pin 11 (PWM pin)
 int IDLEPin = 12;
 int WARNPin = 13;
+int motorPin = 3;
 int fsrReading; // the analog reading from the FSR resistor divider
 int LEDbrightness;
 int state = 0;
@@ -32,6 +33,8 @@ time_t requestSync()
   Serial.write(TIME_REQUEST);  
   return 0; // the time will be sent later in response to serial mesg
 }
+
+
 
 void setup()  {
   Serial.begin(9600);
@@ -85,6 +88,7 @@ void loop(){
       
     case 1:
       digitalWrite(IDLEPin, LOW);
+      digitalWrite(WARNPin, LOW);
       Serial.println("In busy state!");
       //Serial.println("\n");
       if (fsrReading < 10) {
@@ -129,12 +133,21 @@ void loop(){
         analogWrite(LEDpin, LEDbrightness);
         state = 2;
       }
-      break;      
+      break;
+      
+    case 3:
+      digitalWrite(IDLEPin, LOW);
+      analogWrite(LEDpin, LOW);
+      digitalWrite(WARNPin, LOW);      
+      Serial.println("In walking state!");
+      
+      
+      
   }
 
-  JsonArray data = doc.createNestedArray("data");
-  data.add(48.756080);  
-  data.add(2.302038);
+//  JsonArray data = doc.createNestedArray("data");
+//  data.add(48.756080);  
+//  data.add(2.302038);
   
   delay(100);
 }
