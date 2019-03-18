@@ -19,13 +19,10 @@ int currTime;
 int steps;
 
 const int MPU_ADDR = 0x68; // I2C address of the MPU-6050. If AD0 pin is set to HIGH, the I2C address will be 0x69.
-
 int16_t accelerometer_x, accelerometer_y, accelerometer_z; // variables for accelerometer raw data
 int16_t gyro_x, gyro_y, gyro_z; // variables for gyro raw data
 int16_t temperature; // variables for temperature data
-
 char tmp_str[7]; // temporary variable used in convert function
-
 char* convert_int16_to_str(int16_t i) { // converts int16 to string. Moreover, resulting strings will have the same length in the debug monitor.
   sprintf(tmp_str, "%6d", i);
   return tmp_str;
@@ -53,7 +50,6 @@ time_t requestSync()
 
 void setup()  {
   Serial.begin(9600);
-  while (!Serial) ; // Needed for Leonardo only
 
   pinMode(LEDpin, OUTPUT);
   pinMode(IDLEPin, OUTPUT);
@@ -78,7 +74,7 @@ void loop(){
   if (timeStatus()!= timeNotSet) {
     Serial.print(String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second())+": ");
   }
-  DynamicJsonDocument  doc(200);
+  DynamicJsonDocument doc(200);
 
   fsrReading = analogRead(fsrAnalogPin);
   //  Serial.print("Analog reading = ");
@@ -147,6 +143,7 @@ void loop(){
       doc["activity"] = "Sitting";
       doc["start"] = startTime;
       doc["stop"] = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());        
+      doc["temp"] = temperature;
       serializeJson(doc, Serial);
       Serial.println("\n");
       state = 0;
@@ -177,6 +174,7 @@ void loop(){
       doc["activity"] = "Sitting";
       doc["start"] = startTime;
       doc["stop"] = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());        
+      doc["temp"] = temperature;
       serializeJson(doc, Serial);
       Serial.println("\n");
       state = 0;
@@ -197,6 +195,7 @@ void loop(){
     Serial.println("In walking state!");
     Serial.print("Steps:"); Serial.print(steps);
     Serial.print("\n");
+// to make it less sensitive to flunctuation
 //    int avg_ay = 0;
 //    int i=0;
 //    while (i<10) {
@@ -234,6 +233,7 @@ void loop(){
       doc["steps"] = steps;
       doc["start"] = startTime;
       doc["stop"] = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());        
+      doc["temp"] = temperature;
       serializeJson(doc, Serial);
       Serial.println("\n");
       steps = 0;
@@ -245,10 +245,6 @@ void loop(){
     break;
 
   }
-
-  //  JsonArray data = doc.createNestedArray("data");
-  //  data.add(48.756080);  
-  //  data.add(2.302038);
 
   delay(100);
 }
