@@ -89,18 +89,19 @@ void loop(){
   accelerometer_y = Wire.read()<<8 | Wire.read(); // reading registers: 0x3D (ACCEL_YOUT_H) and 0x3E (ACCEL_YOUT_L)
   accelerometer_z = Wire.read()<<8 | Wire.read(); // reading registers: 0x3F (ACCEL_ZOUT_H) and 0x40 (ACCEL_ZOUT_L)
   temperature = Wire.read()<<8 | Wire.read(); // reading registers: 0x41 (TEMP_OUT_H) and 0x42 (TEMP_OUT_L)
+  temperature = temperature/340.00+36.53;
   gyro_x = Wire.read()<<8 | Wire.read(); // reading registers: 0x43 (GYRO_XOUT_H) and 0x44 (GYRO_XOUT_L)
   gyro_y = Wire.read()<<8 | Wire.read(); // reading registers: 0x45 (GYRO_YOUT_H) and 0x46 (GYRO_YOUT_L)
   gyro_z = Wire.read()<<8 | Wire.read(); // reading registers: 0x47 (GYRO_ZOUT_H) and 0x48 (GYRO_ZOUT_L)
-  Serial.print("aX = "); Serial.print(convert_int16_to_str(accelerometer_x));
-  Serial.print(" | aY = "); Serial.print(convert_int16_to_str(accelerometer_y));
-  Serial.print(" | aZ = "); Serial.print(convert_int16_to_str(accelerometer_z));
-  // the following equation was taken from the documentation [MPU-6000/MPU-6050 Register Map and Description, p.30]
-  Serial.print(" | tmp = "); Serial.print(temperature/340.00+36.53);
-  Serial.print(" | gX = "); Serial.print(convert_int16_to_str(gyro_x));
-  Serial.print(" | gY = "); Serial.print(convert_int16_to_str(gyro_y));
-  Serial.print(" | gZ = "); Serial.print(convert_int16_to_str(gyro_z));
-  Serial.println();
+//  Serial.print("aX = "); Serial.print(convert_int16_to_str(accelerometer_x));
+//  Serial.print(" | aY = "); Serial.print(convert_int16_to_str(accelerometer_y));
+//  Serial.print(" | aZ = "); Serial.print(convert_int16_to_str(accelerometer_z));
+//  // the following equation was taken from the documentation [MPU-6000/MPU-6050 Register Map and Description, p.30]
+//  Serial.print(" | tmp = "); Serial.print(temperature/340.00+36.53);
+//  Serial.print(" | gX = "); Serial.print(convert_int16_to_str(gyro_x));
+//  Serial.print(" | gY = "); Serial.print(convert_int16_to_str(gyro_y));
+//  Serial.print(" | gZ = "); Serial.print(convert_int16_to_str(gyro_z));
+//  Serial.println();
   switch(state)
   {
   case 0:
@@ -124,6 +125,8 @@ void loop(){
       state = 1;
     }
     else if (accelerometer_y<-10000 && accelerometer_x<5000) {
+      // This line solves the bug in the demo:
+      startTime = String(year())+'-'+String(month())+'-'+String(day())+'-'+ String(hour())+'-'+String(minute())+'-'+String(second());
       state = 3;
     }
     else {

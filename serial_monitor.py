@@ -5,11 +5,11 @@ import time
 sent = False
 buffert = 30
 
-ser = serial.Serial('/dev/ttyACM0',9600)
+ser = serial.Serial('/dev/ttyACM2',9600)
 syncmes = 'T{}n'.format(int(time.time()))
 # had to send after monitoring
 #ser.write(syncmes.encode("utf-8"))
-
+data = open("data.json","w")
 t = 0
 content = ""
 while True:
@@ -23,4 +23,6 @@ while True:
     if content[0] == "{":
         print("!!!!!!!!!!!!!!!!!!!!!")
         j = json.loads(content)
+        data.write(content)
         print(j)
+data.close()
